@@ -1,10 +1,40 @@
 package com.example.domain.entity
 
-import java.io.Serializable
+import android.os.Parcel
+import android.os.Parcelable
 
 data class GameSettings(
     val maxSumValue: Int,
     val minCountOfRightAnswers: Int,
     val minPercentOfRightAnswer: Int,
     val gameTimeInSeconds: Int
-) : Serializable
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readInt()
+    ) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(maxSumValue)
+        parcel.writeInt(minCountOfRightAnswers)
+        parcel.writeInt(minPercentOfRightAnswer)
+        parcel.writeInt(gameTimeInSeconds)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<GameSettings> {
+        override fun createFromParcel(parcel: Parcel): GameSettings {
+            return GameSettings(parcel)
+        }
+
+        override fun newArray(size: Int): Array<GameSettings?> {
+            return arrayOfNulls(size)
+        }
+    }
+}

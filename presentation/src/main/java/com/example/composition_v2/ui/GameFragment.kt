@@ -1,12 +1,15 @@
 package com.example.composition_v2.ui
 
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.composition_v2.R
 import com.example.composition_v2.databinding.FragmentGameBinding
+import com.example.composition_v2.extensions.parcelable
 import com.example.domain.entity.GameResult
 import com.example.domain.entity.GameSettings
 import com.example.domain.entity.Level
@@ -44,7 +47,9 @@ class GameFragment : Fragment() {
     }
 
     private fun parseArgs() {
-        level = requireArguments().getSerializable(KEY_LEVEL) as Level
+        requireArguments().parcelable<Level>(KEY_LEVEL)?.let {
+            level = it
+        }
     }
 
     private fun launchGameFinished(gameResult: GameResult) {
@@ -63,7 +68,7 @@ class GameFragment : Fragment() {
         fun newInstance(level: Level): GameFragment {
             return GameFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(KEY_LEVEL, level)
+                    putParcelable(KEY_LEVEL, level)
                 }
             }
         }
