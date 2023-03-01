@@ -29,16 +29,16 @@ class GameFragmentViewModel(application: Application) : AndroidViewModel(applica
     private var countOfQuestions = 0
 
     private val _formattedTime = MutableLiveData<String>()
-    private val formattedTime: LiveData<String>
+    val formattedTime: LiveData<String>
         get() = _formattedTime
 
     private val _question = MutableLiveData<Questions>()
     val question: LiveData<Questions>
         get() = _question
 
-    private val _percentOnRightAnswers = MutableLiveData<Int>()
+    private val _percentOfRightAnswers = MutableLiveData<Int>()
     val percentOnRightAnswers: LiveData<Int>
-        get() = _percentOnRightAnswers
+        get() = _percentOfRightAnswers
 
     private val _progressAnswers = MutableLiveData<String>()
     val progressAnswers: LiveData<String>
@@ -53,16 +53,17 @@ class GameFragmentViewModel(application: Application) : AndroidViewModel(applica
         get() = _enoughPercent
 
     private val _miPercent = MutableLiveData<Int>()
-    private val miPercent: LiveData<Int>
+    val miPercent: LiveData<Int>
         get() = _miPercent
 
     private val _gameResult = MutableLiveData<GameResult>()
-    private val gameResult: LiveData<GameResult>
+    val gameResult: LiveData<GameResult>
         get() = _gameResult
 
     fun startGame(level: Level) {
         getGameSettings(level)
         startTimer()
+        updateProgress()
         generateQuestion()
     }
 
@@ -74,15 +75,16 @@ class GameFragmentViewModel(application: Application) : AndroidViewModel(applica
 
     private fun updateProgress() {
         val percent = calculatePercentOfRightAnswers()
-        _percentOnRightAnswers.value = percent
+        _percentOfRightAnswers.value = percent
         _progressAnswers.value =
             context.getString(R.string.progress_answers, countOfRightAnswers, gameSettings.minCountOfRightAnswers)
         _enoughCount.value = countOfRightAnswers >= gameSettings.minCountOfRightAnswers
-        _enoughPercent.value = percent >= gameSettings.minPercentOfRightAnswer
+        _enoughPercent.value = percent >= gameSettings.minPercentOfRightAnswers
     }
 
     private fun calculatePercentOfRightAnswers(): Int {
-        return (countOfRightAnswers / countOfQuestions * 100.0).toInt()
+        if (countOfQuestions == 0) return 0
+        return ((countOfRightAnswers / countOfQuestions.toDouble()) * 100).toInt()
     }
 
     private fun checkAnswer(number: Int) {
@@ -96,7 +98,7 @@ class GameFragmentViewModel(application: Application) : AndroidViewModel(applica
     private fun getGameSettings(level: Level) {
         this.level = level
         gameSettings = getGameSettingsUseCase(level)
-        _miPercent.value = gameSettings.minPercentOfRightAnswer
+        _miPercent.value = gameSettings.minPercentOfRightAnswers
     }
 
     private fun startTimer() {
@@ -113,7 +115,7 @@ class GameFragmentViewModel(application: Application) : AndroidViewModel(applica
         timer?.start()
     }
 
-    fun generateQuestion() {
+    private fun generateQuestion() {
         _question.value = generateQuestionUseCase(gameSettings.maxSumValue)
     }
 
@@ -121,7 +123,7 @@ class GameFragmentViewModel(application: Application) : AndroidViewModel(applica
         val second = millisUntilFinished / MILLS_IN_SECONDS
         val minutes = second / SECOND_IN_MINUTES
         val leftSeconds = second - (minutes * SECOND_IN_MINUTES)
-        return String.format("%0.2d:%0.2d", minutes, leftSeconds)
+        return String.format("%02d:%02d", minutes, leftSeconds)
     }
 
     private fun finishGames() {

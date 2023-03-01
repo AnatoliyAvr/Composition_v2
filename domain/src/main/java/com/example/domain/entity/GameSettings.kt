@@ -6,7 +6,7 @@ import android.os.Parcelable
 data class GameSettings(
     val maxSumValue: Int,
     val minCountOfRightAnswers: Int,
-    val minPercentOfRightAnswer: Int,
+    val minPercentOfRightAnswers: Int,
     val gameTimeInSeconds: Int
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -20,7 +20,7 @@ data class GameSettings(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(maxSumValue)
         parcel.writeInt(minCountOfRightAnswers)
-        parcel.writeInt(minPercentOfRightAnswer)
+        parcel.writeInt(minPercentOfRightAnswers)
         parcel.writeInt(gameTimeInSeconds)
     }
 
