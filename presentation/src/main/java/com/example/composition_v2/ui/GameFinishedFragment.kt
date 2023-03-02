@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+import androidx.navigation.fragment.findNavController
 import com.example.composition_v2.R
 import com.example.composition_v2.databinding.FragmentGameFinishedBinding
 import com.example.composition_v2.extensions.parcelable
@@ -59,15 +58,10 @@ class GameFinishedFragment : Fragment() {
         binding.buttonRetry.setOnClickListener {
             retryGame()
         }
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                retryGame()
-            }
-        })
     }
 
     private fun retryGame() {
-        requireActivity().supportFragmentManager.popBackStack(GameFragment.NAME, POP_BACK_STACK_INCLUSIVE)
+        findNavController().popBackStack()
     }
 
     private fun parsArgs() {
@@ -78,15 +72,7 @@ class GameFinishedFragment : Fragment() {
 
     companion object {
 
-        private const val KEY_GAME_RESULT = "game_result"
-
-        fun newInstance(gameResult: GameResult): GameFinishedFragment {
-            return GameFinishedFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_GAME_RESULT, gameResult)
-                }
-            }
-        }
+        const val KEY_GAME_RESULT = "game_result"
     }
 
     override fun onDestroyView() {
