@@ -10,24 +10,21 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.composition_v2.R
 import com.example.composition_v2.databinding.FragmentGameBinding
-import com.example.composition_v2.extensions.parcelable
 import com.example.domain.entity.GameResult
-import com.example.domain.entity.Level
 
 class GameFragment : Fragment() {
 
     private val viewModel: GameFragmentViewModel by lazy {
+        val args = GameFragmentArgs.fromBundle(requireArguments())
         ViewModelProvider(
-            this, GameFragmentViewModelFactory(requireActivity().application, level)
+            this, GameFragmentViewModelFactory(requireActivity().application, args.level)
         )[GameFragmentViewModel::class.java]
     }
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding ?: throw RuntimeException("GameFragment == null")
 
-    private lateinit var level: Level
 
     private val tvOptions by lazy {
         mutableListOf<TextView>().apply {
@@ -38,11 +35,6 @@ class GameFragment : Fragment() {
             add(binding.tvOption5)
             add(binding.tvOption6)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parseArgs()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -105,22 +97,12 @@ class GameFragment : Fragment() {
         return ContextCompat.getColor(requireContext(), colorResId)
     }
 
-    private fun parseArgs() {
-        requireArguments().parcelable<Level>(KEY_LEVEL)?.let {
-            level = it
-        }
-    }
-
     private fun launchGameFinishedFragment(gameResult: GameResult) {
-        val args = Bundle().apply {
-            putParcelable(GameFinishedFragment.KEY_GAME_RESULT, gameResult)
-        }
-        findNavController().navigate(R.id.action_gameFragment_to_gameFinishedFragment, args)
-    }
-
-    companion object {
-
-        const val KEY_LEVEL = "level"
+        findNavController().navigate(
+            GameFragmentDirections.actionGameFragmentToGameFinishedFragment(
+                gameResult
+            )
+        )
     }
 
     override fun onDestroyView() {
